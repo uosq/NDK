@@ -11,6 +11,12 @@ local cvar_t = {
 
 cvar_t.__index = cvar_t
 
+--- Returns the type of its only argument, coded as a string.
+---@return "AttributeDefinition" | "BitBuffer" | "DrawModelContext" | "Entity" | "EulerAngles" | "EventInfo" | "GameEvent" | "GameServerLobby" | "Item" | "ItemDefinition" | "LobbyPlayer" | "MatchGroup" | "MatchMapDefinition" | "Material" | "Model" | "NetChannel" | "NetMessage" | "PartyMemberActivity" | "PhysicsCollisionModel" | "PhysicsEnvironment" | "PhysicsObject" | "PhysicsObjectParameters" | "PhysicsSolid" | "StaticPropRenderInfo" | "StringCmd" | "StudioBBox" | "StudioHitboxSet" | "StudioModelHeader" | "TempEntity" | "Texture" | "Trace" | "UserCmd" | "UserMessage" | "Vector3" | "ViewSetup" | "WeaponData
+local function typeof(v)
+	return tostring(getmetatable(v).__name)
+end
+
 ---@param defaultValue string|number
 function cvar_t.New(defaultValue)
 	assert(type(defaultValue), "ConVar value must not be nil!")
@@ -101,15 +107,19 @@ function lib:Init()
 end
 
 ---@param name string
----@param defaultValue number|string
+---@param defaultValue number|string|Vector3
 ---@return boolean success
 function lib:RegisterConVar(name, defaultValue)
 	assert(type(name) == "string", "Trying to register a cvar with the wrong type of name!")
-	assert(type(defaultValue) == "string" or type(defaultValue) == "number", "The default value must be a string or number!")
+	assert(type(defaultValue) == "string" or type(defaultValue) == "number" or typeof(defaultValue) == "Vector3", "The default value must be a string or number!")
 
 	--- sanitize our stuff
 	if type(defaultValue) == "number" then
 		defaultValue = tostring(defaultValue)
+	end
+
+	if typeof(defaultValue) == "Vector3" then
+		defaultValue = string.format("%s %s %s", defaultValue.x, defaultValue.y, defaultValue.z)
 	end
 
 	--- lsp hacks
@@ -135,13 +145,17 @@ end
 ---Sets the value of a convar managed by the SDK \
 ---Does NOT set values for TF2's convars!
 ---@param name string
----@param newValue string|number
+---@param newValue string|number|Vector3
 function lib:SetConVar(name, newValue)
 	assert(type(name) == "string", "name must be a string!")
-	assert(type(newValue) == "string" or type(newValue) == "number", "New ConVar value must be a number or string!")
+	assert(type(newValue) == "string" or type(newValue) == "number" or typeof(newValue) == "Vector3", "New ConVar value must be a number or string!")
 
 	if type(newValue) == "number" then
 		newValue = tostring(newValue)
+	end
+
+	if typeof(newValue) == "Vector3" then
+		newValue = string.format("%s %s %s", newValue.x, newValue.y, newValue.z)
 	end
 
 	--- another lsp hack
