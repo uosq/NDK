@@ -49,7 +49,7 @@ print(cvar:GetNumber(), cvar:GetString())
 
 ## How to **Reinterpret**
 
-`ndk.Reinterpret` is a special function that converts a `Entity` or `table` into the class (second parameter)
+`ndk.Reinterpret` is a special function that converts a `Entity` or `table` into the specified class (second parameter)
 
 Example
 
