@@ -161,44 +161,41 @@ end
 -- Clip velocity along a plane normal
 local function ClipVelocity(velocity, normal, overbounce)
 	local backoff = velocity:Dot(normal) * overbounce
-	
+
 	velocity.x = velocity.x - normal.x * backoff
 	velocity.y = velocity.y - normal.y * backoff
 	velocity.z = velocity.z - normal.z * backoff
-	
+
 	-- Zero out small components
 	if math.abs(velocity.x) < 0.01 then velocity.x = 0 end
 	if math.abs(velocity.y) < 0.01 then velocity.y = 0 end
 	if math.abs(velocity.z) < 0.01 then velocity.z = 0 end
 end
 
--- Perform collision-aware movement
 local function TryPlayerMove(origin, velocity, mins, maxs, index, tickinterval)
 	local MAX_CLIP_PLANES = 5
 	local time_left = tickinterval
 	local planes = {}
 	local numplanes = 0
-	local original_velocity = Vector3(velocity.x, velocity.y, velocity.z)
-	local new_velocity = Vector3(velocity.x, velocity.y, velocity.z)
-	
+
 	-- Try moving up to 4 times (with bumps)
 	for bumpcount = 0, 3 do
 		if time_left <= 0 then
 			break
 		end
-		
+
 		-- Calculate end position
 		local end_pos = Vector3(
 			origin.x + velocity.x * time_left,
 			origin.y + velocity.y * time_left,
 			origin.z + velocity.z * time_left
 		)
-		
+
 		-- Trace from current position to desired position
 		local trace = engine.TraceHull(origin, end_pos, mins, maxs, MASK_PLAYERSOLID, function(ent, contentsMask)
 			return ent:GetIndex() ~= index
 		end)
-		
+
 		-- If we made it all the way, we're done
 		if trace.fraction > 0 then
 			origin.x = trace.endpos.x
@@ -206,32 +203,32 @@ local function TryPlayerMove(origin, velocity, mins, maxs, index, tickinterval)
 			origin.z = trace.endpos.z
 			numplanes = 0
 		end
-		
+
 		if trace.fraction == 1 then
 			break
 		end
-		
+
 		-- Update time remaining
 		time_left = time_left - time_left * trace.fraction
-		
+
 		-- Record this plane
 		if trace.plane and numplanes < MAX_CLIP_PLANES then
 			planes[numplanes] = trace.plane
 			numplanes = numplanes + 1
 		end
-		
+
 		-- Modify velocity to slide along the plane
 		if trace.plane then
 			-- If we hit the ground and going down, stop vertical movement
 			if trace.plane.z > 0.7 and velocity.z < 0 then
 				velocity.z = 0
 			end
-			
+
 			-- Clip velocity against all planes we've hit
 			local i = 0
 			while i < numplanes do
 				ClipVelocity(velocity, planes[i], 1.0)
-				
+
 				-- Check if velocity is still going into any plane
 				local j = 0
 				while j < numplanes do
@@ -243,14 +240,14 @@ local function TryPlayerMove(origin, velocity, mins, maxs, index, tickinterval)
 					end
 					j = j + 1
 				end
-				
+
 				if j == numplanes then
 					break
 				end
-				
+
 				i = i + 1
 			end
-			
+
 			-- If we're going into all planes, stop
 			if i == numplanes then
 				if numplanes >= 2 then
@@ -260,13 +257,13 @@ local function TryPlayerMove(origin, velocity, mins, maxs, index, tickinterval)
 						planes[0].z * planes[1].x - planes[0].x * planes[1].z,
 						planes[0].x * planes[1].y - planes[0].y * planes[1].x
 					)
-					
+
 					local d = dir:Dot(velocity)
 					velocity.x = dir.x * d
 					velocity.y = dir.y * d
 					velocity.z = dir.z * d
 				end
-				
+
 				-- Still going into a plane, stop all movement
 				local dot = velocity:Dot(planes[0])
 				if dot < 0 then
@@ -308,7 +305,6 @@ local function RunSeconds(player, time_seconds, lazyness)
 	local _, sv_accelerate = client.GetConVar("sv_accelerate")
 
 	local index = player:GetIndex()
-	local curtime = globals.CurTime()
 
 	local speed = velocity:Length2D()
 	local wishspeed = math.min(speed, maxspeed)
@@ -330,7 +326,6 @@ local function RunSeconds(player, time_seconds, lazyness)
 			velocity.z = velocity.z - 800 * tickinterval
 		end
 
-		-- Perform collision-aware movement
 		origin = TryPlayerMove(origin, velocity, mins, maxs, index, tickinterval)
 
 		-- If on ground, stick to it
