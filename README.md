@@ -2,6 +2,12 @@
 
 Made to help people make Lua Scripts for Lmaobox
 
+## Warning
+
+**This was made to be used with Luabundle/Luabundler**
+
+Any undefined behavior of requiring it outside of a bundled script should NOT be complained to me (navet). **I will ignore your complaint!**
+
 ## How to build
 
 * Requirements
