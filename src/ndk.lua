@@ -1,6 +1,5 @@
 local playerWrap = require("src.wrappers.player")
 local weaponWrap = require("src.wrappers.weapon")
-local basePlayerWrap = require("src.wrappers.baseplayer")
 
 local inputlib = require("src.input")
 local mathlib = require("src.mathlib")
@@ -55,10 +54,6 @@ end
 
 function ndk.GetPlayerClass()
 	return playerWrap
-end
-
-function ndk.GetBasePlayerClass()
-	return basePlayerWrap
 end
 
 ---@return Player[]
