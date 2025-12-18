@@ -276,6 +276,8 @@ end
 --- Man this was an absolute nightmare to convert to Lua
 --- Holy shit
 --- Why we dont have a function for this natively??
+
+--- This should only be called from a Localplayer's Weapon!
 ---@param cmd UserCmd
 ---@return boolean
 function Weapon:IsAttacking(cmd)
