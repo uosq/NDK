@@ -16,6 +16,27 @@ function Player.Get(entity)
 	return setmetatable({__handle = entity}, Player)
 end
 
+---@param attrib string
+---@param defaultValue number? # optional (default = `1.0`)
+---@return number
+function Player:AttributeHookFloat(attrib, defaultValue)
+	return self.__handle:AttributeHookFloat(attrib, defaultValue)
+end
+
+---@param attrib string
+---@param defaultValue number? # optional (default = `1.0`)
+function Player:AttributeHookInt(attrib, defaultValue)
+	return self.__handle:AttributeHookInt(attrib, defaultValue)
+end
+
+function Player:GetVelocity()
+	return self.__handle:EstimateAbsVelocity()
+end
+
+function Player:GetCarryingRuneType()
+	return self.__handle:GetCarryingRuneType()
+end
+
 ---@param boneIndex BoneIndex
 ---@return Vector3?
 function Player:GetBonePosition(boneIndex)

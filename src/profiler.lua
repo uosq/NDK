@@ -8,12 +8,12 @@ local interval = 0.5
 local accum = 0.0
 
 ---@param name string
-function Profiler.Start(name)
+function Profiler:Start(name)
 	active[name] = os.clock()
 end
 
 ---@param name string
-function Profiler.Stop(name)
+function Profiler:Stop(name)
 	local start = active[name]
 	if not start then
 		return false
@@ -25,13 +25,13 @@ function Profiler.Stop(name)
 	return true
 end
 
-function Profiler.Reset()
+function Profiler:Reset()
 	for k in pairs(results) do
 		results[k] = nil
 	end
 end
 
-function Profiler.Present()
+function Profiler:Present()
 	draw.SetFont(font)
 	draw.Color(255, 255, 255, 255)
 
@@ -58,7 +58,7 @@ function Profiler.Present()
 	accum = accum + globals.AbsoluteFrameTime()
 	if accum >= interval then
 		accum = accum - interval
-		Profiler.Reset()
+		self:Reset()
 	end
 end
 

@@ -40,15 +40,16 @@ local function Accelerate(velocity, wishdir, wishspeed, accel, frametime)
 	velocity.z = velocity.z + wishdir.z * accelspeed
 end
 
----@param target Entity
+---@param target Player
 ---@return number
 local function GetAirSpeedCap(target)
-	local m_hGrapplingHookTarget = target:GetPropEntity("m_hGrapplingHookTarget")
+	local m_hGrapplingHookTarget = target:m_hGrapplingHookTarget()
 	if m_hGrapplingHookTarget then
 		if target:GetCarryingRuneType() == RuneTypes_t.RUNE_AGILITY then
-			local m_iClass = target:GetPropInt("m_iClass")
+			local m_iClass = target:m_iClass()
 			return (m_iClass == E_Character.TF2_Soldier or E_Character.TF2_Heavy) and 850 or 950
 		end
+
 		local _, tf_grapplinghook_move_speed = client.GetConVar("tf_grapplinghook_move_speed")
 		return tf_grapplinghook_move_speed
 	elseif target:InCond(E_TFCOND.TFCond_Charging) then
@@ -60,15 +61,18 @@ local function GetAirSpeedCap(target)
 			local _, tf_parachute_aircontrol = client.GetConVar("tf_parachute_aircontrol")
 			flCap = flCap * tf_parachute_aircontrol
 		end
+
 		if target:InCond(E_TFCOND.TFCond_HalloweenKart) then
 			if target:InCond(E_TFCOND.TFCond_HalloweenKartDash) then
 				local _, tf_halloween_kart_dash_speed = client.GetConVar("tf_halloween_kart_dash_speed")
 				return tf_halloween_kart_dash_speed
 			end
+
 			local _, tf_hallowen_kart_aircontrol = client.GetConVar("tf_hallowen_kart_aircontrol")
 			flCap = flCap * tf_hallowen_kart_aircontrol
 		end
-		return flCap * target:AttributeHookFloat("mod_air_control")
+
+		return flCap * target:AttributeHookFloat("mod_air_control", 0)
 	end
 end
 
@@ -78,7 +82,7 @@ end
 ---@param accel number
 ---@param dt number globals.TickInterval()
 ---@param surf number Is currently surfing?
----@param target Entity
+---@param target Player
 local function AirAccelerate(v, wishdir, wishspeed, accel, dt, surf, target)
 	wishspeed = math.min(wishspeed, GetAirSpeedCap(target))
 	local currentspeed = v:Dot(wishdir)
@@ -281,12 +285,12 @@ local function TryPlayerMove(origin, velocity, mins, maxs, index, tickinterval)
 	return origin
 end
 
----@param player Entity
+---@param player Player
 ---@param time_seconds number
 ---@return Vector3[] Path, Vector3 LastPosition
 local function RunSeconds(player, time_seconds, lazyness)
 	local path = {}
-	local velocity = player:EstimateAbsVelocity() or Vector3()
+	local velocity = player:GetVelocity() or Vector3()
 	local origin = player:GetAbsOrigin() + Vector3(0, 0, 1)
 
 	if velocity:Length() <= 10 then
@@ -294,7 +298,7 @@ local function RunSeconds(player, time_seconds, lazyness)
 		return path, origin
 	end
 
-	local maxspeed = player:GetPropFloat("m_flMaxspeed") or 450
+	local maxspeed = player:m_flMaxspeed() or 450
 	local clock = 0.0
 	local tickinterval = globals.TickInterval() * (lazyness or 10.0)
 	local wishdir = velocity / velocity:Length()

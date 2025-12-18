@@ -1,3 +1,5 @@
+local ndk = {}
+
 local playerWrap = require("src.wrappers.player")
 local weaponWrap = require("src.wrappers.weapon")
 
@@ -12,10 +14,10 @@ local EAmmoType = require("src.ammotype")
 local EMinigunState = require("src.minigunstate")
 local EBoneIndex = require("src.boneindexes")
 
+local profiler = require("src.profiler")
+
 local playerSimulation = require("src.prediction.playersim")
 local projectileSimulation = require("src.prediction.projectilesim")
-
-local ndk = {}
 
 function ndk.GetPlayerSim()
 	return playerSimulation
@@ -105,6 +107,10 @@ end
 
 function ndk.GetMinigunStateEnum()
 	return EMinigunState
+end
+
+function ndk.GetProfiler()
+	return profiler
 end
 
 return ndk
