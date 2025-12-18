@@ -8,13 +8,14 @@ local TF_PARTICLE_MAX_CHARGE_TIME = 2.0
 local EMinigunState = require("src.minigunstate")
 local mathlib = require("src.mathlib")
 
+local iThrowTick = -5
+local iLastTickBase = 0
+local Throwing = false
+local bFiring, bLoading = false, false
+
 ---@class Weapon: BaseWrapper
 ---@field protected __handle Entity
 local Weapon = {
-	iThrowTick = -5,
-	iLastTickBase = 0,
-	Throwing = false,
-	bFiring = false, bLoading = false,
 }
 Weapon.__index = Weapon
 setmetatable(Weapon, {__index = BaseClass})
@@ -297,24 +298,24 @@ function Weapon:IsAttacking(cmd)
 
 		elseif weaponID == TF_WEAPON_BAT_WOOD
 		or weaponID == E_WeaponBaseID.TF_WEAPON_BAT_GIFTWRAP then
-			if (iTickBase ~= self.iLastTickBase) then
-				self.iThrowTick = math.max(self.iThrowTick - 1, -5)
+			if (iTickBase ~= iLastTickBase) then
+				iThrowTick = math.max(iThrowTick - 1, -5)
 			end
-			self.iLastTickBase = iTickBase
+			iLastTickBase = iTickBase
 
-			if self:CanPrimaryAttack() and self:HasPrimaryAmmoForShot() and cmd.buttons & IN_ATTACK2 ~= 0 and self.iThrowTick == -5 then
-				self.iThrowTick = 12
+			if self:CanPrimaryAttack() and self:HasPrimaryAmmoForShot() and cmd.buttons & IN_ATTACK2 ~= 0 and iThrowTick == -5 then
+				iThrowTick = 12
 			end
 
-			if self.iThrowTick > -5 then
+			if iThrowTick > -5 then
 				Throwing = true
 			end
 
-			if self.iThrowTick > 1 then
+			if iThrowTick > 1 then
 				Throwing = true
 			end
 
-			if self.iThrowTick == 1 then
+			if iThrowTick == 1 then
 				return true
 			end
 		end
@@ -360,22 +361,22 @@ function Weapon:IsAttacking(cmd)
 	or weaponID == TF_WEAPON_JAR
 	or weaponID == TF_WEAPON_JAR_MILK
 	or weaponID == TF_WEAPON_JAR_GAS then
-		if iTickBase ~= self.iLastTickBase then
-			self.iThrowTick = math.max(self.iThrowTick - 1, -5)
+		if iTickBase ~= iLastTickBase then
+			iThrowTick = math.max(iThrowTick - 1, -5)
 		end
-		self.iLastTickBase = iTickBase
+		iLastTickBase = iTickBase
 
 		local iAttack = weaponID == E_WeaponBaseID.TF_WEAPON_CLEAVER and IN_ATTACK | IN_ATTACK2 or IN_ATTACK
-		if self:CanPrimaryAttack() and self:HasPrimaryAmmoForShot() and cmd.buttons & IN_ATTACK ~= 0 and iAttack ~= 0 and self.iThrowTick == -5 then
-			self.iThrowTick = 12
+		if self:CanPrimaryAttack() and self:HasPrimaryAmmoForShot() and cmd.buttons & IN_ATTACK ~= 0 and iAttack ~= 0 and iThrowTick == -5 then
+			iThrowTick = 12
 		end
-		if self.iThrowTick > -5 then
+		if iThrowTick > -5 then
 			Throwing = true
 		end
-		if self.iThrowTick > 1 then
-			self.iThrowTick = 2
+		if iThrowTick > 1 then
+			iThrowTick = 2
 		end
-		return self.iThrowTick == 1
+		return iThrowTick == 1
 	end
 
 	if weaponID == TF_WEAPON_MINIGUN then
@@ -417,15 +418,15 @@ function Weapon:IsAttacking(cmd)
 	if self:m_iItemDefinitionIndex() == 730 then
 		local bAmmo = self:HasPrimaryAmmoForShot()
 		if bAmmo == 0 then
-			self.bLoading = false
-			self.bFiring = false
-		elseif not self.bFiring then
-			self.bLoading = true
+			bLoading = false
+			bFiring = false
+		elseif not bFiring then
+			bLoading = true
 		end
 
-		if ((self.bFiring or (self.bLoading and (cmd.buttons & IN_ATTACK == 0))) and bAmmo ~= 0) then
-			self.bFiring = true
-			self.bLoading = false
+		if ((bFiring or (bLoading and (cmd.buttons & IN_ATTACK == 0))) and bAmmo ~= 0) then
+			bFiring = true
+			bLoading = false
 			return self:CanPrimaryAttack()
 		end
 
