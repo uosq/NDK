@@ -1,4 +1,10 @@
+---@class NDK
 local ndk = {}
+
+---@diagnostic disable-next-line: undefined-global
+if __bundle_require == nil then
+	printc(0, 255, 255, 255, "NDK not required from a bundled script! Might not unload correctly")
+end
 
 local playerWrap = require("src.wrappers.player")
 local weaponWrap = require("src.wrappers.weapon")
@@ -9,6 +15,7 @@ local chokedlib = require("src.chokedcmds")
 
 local angleManager = require("src.angleMgr")
 local cvarManager = require("src.cvarManager")
+local keyValLib = require("src.keyvalues")
 
 local EAmmoType = require("src.ammotype")
 local EMinigunState = require("src.minigunstate")
@@ -111,6 +118,10 @@ end
 
 function ndk.GetProfiler()
 	return profiler
+end
+
+function ndk.GetKeyValueLib()
+	return keyValLib
 end
 
 return ndk
