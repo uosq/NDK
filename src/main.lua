@@ -16,6 +16,7 @@ local chokedlib = require("src.chokedcmds")
 local angleManager = require("src.angleMgr")
 local cvarManager = require("src.cvarManager")
 local keyValLib = require("src.keyvalues")
+local colorManager = require("src.colors")
 
 local EAmmoType = require("src.ammotype")
 local EMinigunState = require("src.minigunstate")
@@ -122,6 +123,10 @@ end
 
 function ndk.GetKeyValueLib()
 	return keyValLib
+end
+
+function ndk.GetColorManager()
+	return colorManager
 end
 
 return ndk

@@ -286,6 +286,11 @@ function Weapon:IsAttacking(cmd)
 		return false
 	end
 
+	if m_hOwner:GetIndex() ~= client.GetLocalPlayerIndex() then
+		error("Weapon:IsAttacking should ever be called from a localplayer's weapon!")
+		return false
+	end
+
 	if cmd.weaponselect ~= 0 then
 		return false
 	end

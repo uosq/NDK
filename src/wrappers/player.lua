@@ -16,6 +16,18 @@ function Player.Get(entity)
 	return setmetatable({__handle = entity}, Player)
 end
 
+function Player:IsEnemy()
+	local plocal = entities.GetLocalPlayer()
+	if plocal == nil then
+		return false --- enemy unless we exist
+	end
+
+	local localteam = plocal:GetTeamNumber()
+	local ourteam = self:GetTeamNumber()
+
+	return localteam ~= ourteam
+end
+
 ---@param attrib string
 ---@param defaultValue number? # optional (default = `1.0`)
 ---@return number
