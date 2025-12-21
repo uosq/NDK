@@ -2,21 +2,6 @@ local lib = {}
 
 local RAD2DEG = 180/math.pi
 
----@param vec Vector3
----@return number
-function lib.NormalizeVector(vec)
-	local len = vec:Length()
-	if len < 0.0001 then
-		return 0
-	end
-
-	vec.x = vec.x / len
-	vec.y = vec.y / len
-	vec.z = vec.z / len
-
-	return len
-end
-
 ---@param from Vector3
 ---@param to Vector3
 ---@param clamp boolean # When true, clamps the angle (default: true)
@@ -88,11 +73,12 @@ function lib.Clamp(val, min, max)
 	return math.min(max, math.max(val, min))
 end
 
+---Remaps the value from range a-b to c-d
 ---@param val number
----@param a number
----@param b number
----@param c number
----@param d number
+---@param a number min
+---@param b number max
+---@param c number min
+---@param d number max
 ---@param clamp boolean? true
 function lib.RemapVal(val, a, b, c, d, clamp)
 	clamp = clamp == nil and true or clamp

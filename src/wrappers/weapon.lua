@@ -7,11 +7,14 @@ local TF_PARTICLE_MAX_CHARGE_TIME = 2.0
 
 local EMinigunState = require("src.minigunstate")
 local mathlib = require("src.mathlib")
+local vectorlib = require("src.vectorlib")
 
 local iThrowTick = -5
 local iLastTickBase = 0
 local Throwing = false
 local bFiring, bLoading = false, false
+
+local TF_TEAM_PVE_INVADERS = 3
 
 ---@class Weapon: BaseWrapper
 ---@field protected __handle Entity
@@ -444,6 +447,74 @@ function Weapon:IsAttacking(cmd)
 --- return G::CanPrimaryAttack && pCmd->buttons & IN_ATTACK ? 1 : G::Reloading && pCmd->buttons & IN_ATTACK ? 2 : 0;
 --- we dont have m_bInReload so I can't get the reloading part :p
 	return (self:CanPrimaryAttack() and cmd.buttons & IN_ATTACK ~= 0)
+end
+
+---@param plocal Player
+---@param pTarget Player
+---@return boolean
+local function IsBehindAndFacingEntity(plocal, pTarget, fovPercent, range)
+	local dir = pTarget:GetWorldSpaceCenter() - plocal:GetWorldSpaceCenter() -- local -> target
+	if dir:Length() > range then return false end
+	--dir.z = 0
+	vectorlib.Normalize(dir)
+
+	local localForward = engine.GetViewAngles():Forward()
+	--localForward.z = 0
+	vectorlib.Normalize(localForward)
+
+	local targetForward = EulerAngles(pTarget:m_angEyeAngles():Unpack()):Forward()
+	--targetForward.z = 0
+	vectorlib.Normalize(targetForward)
+
+	local posVsTargetView = dir:Dot(targetForward)
+	local posVsLocalView = dir:Dot(localForward)
+	local viewAnglesDot = localForward:Dot(targetForward)
+
+	local isBehind = posVsTargetView > 0 --- for some reason this is positive, but in the tf2's source code it is negative wtf
+	local maxAngle = fovPercent * math.pi/2
+	local fovDot = math.cos(maxAngle)
+	local isLookingAtTarget = posVsLocalView >= fovDot
+	local isFacingBack = viewAnglesDot > -0.3
+
+	return (isBehind and isLookingAtTarget and isFacingBack)
+end
+
+---@param pTarget Player
+---@param fov number [0, 1] (0 = 0%; 1 = 100%)
+---@param range number? Max distance that we can backstab (Usually 48 HUs) (default: 48)
+---@return boolean
+function Weapon:CanBackstab(pTarget, fov, range)
+	local m_hOwner = playerWrapper.Get(self:m_hOwner())
+	if m_hOwner == nil then
+		return false
+	end
+
+	if pTarget == nil then
+		return false
+	end
+
+	local iNoBackstab = pTarget:AttributeHookInt("cannot_be_backstabbed")
+	if iNoBackstab == 0 then
+		return false
+	end
+
+	range = range == nil and 48 or range
+
+	if IsBehindAndFacingEntity(m_hOwner, pTarget, fov, range) then
+		return true
+	end
+
+	if gamerules.IsMvM() and pTarget:GetTeamNumber() == TF_TEAM_PVE_INVADERS then
+		if pTarget:InCond(E_TFCOND.TFCond_MVMBotRadiowave) then
+			return true
+		end
+
+		if pTarget:InCond(E_TFCOND.TFCond_Sapped) and not pTarget:m_bIsMiniBoss() then
+			return true
+		end
+	end
+
+	return false
 end
 
 return Weapon

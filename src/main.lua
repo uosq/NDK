@@ -3,11 +3,13 @@ local ndk = {}
 
 ---@diagnostic disable-next-line: undefined-global
 if __bundle_require == nil then
-	printc(0, 255, 255, 255, "NDK not required from a bundled script! Might not unload correctly")
+	printc(0, 255, 255, 255, "NDK not required from a bundled script! Might not unload correctly some callbacks")
 end
 
-local playerWrap = require("src.wrappers.player")
+local CTFPlayer = require("src.wrappers.player")
 local weaponWrap = require("src.wrappers.weapon")
+local CObjectSentrygun = require("src.wrappers.cobjectsentrygun")
+local CBaseObject = require("src.wrappers.cbaseobject")
 
 local inputlib = require("src.input")
 local mathlib = require("src.mathlib")
@@ -63,12 +65,20 @@ function ndk.GetWeaponClass()
 end
 
 function ndk.GetPlayerClass()
-	return playerWrap
+	return CTFPlayer
+end
+
+function ndk.GetBaseObjectClass()
+	return CBaseObject
+end
+
+function ndk.GetSentryClass()
+	return CObjectSentrygun
 end
 
 ---@return Player[]
 function ndk.GetPlayerList()
-	local baseclass = playerWrap
+	local baseclass = CTFPlayer
 	local list = {}
 
 	for i = 1, globals.MaxClients() do
