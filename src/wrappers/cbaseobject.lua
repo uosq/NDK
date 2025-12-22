@@ -22,6 +22,18 @@ function CBaseObject:IsAlive()
 	return self.__handle:GetHealth() > 0
 end
 
+function CBaseObject:CanUpgrade()
+	return self:m_iUpgradeLevel() < self:m_iHighestUpgradeLevel()
+end
+
+function CBaseObject:IsTeleporterExit()
+	return self:IsTeleporter() and self:m_iObjectMode() == 1
+end
+
+function CBaseObject:CompletelyBuilt()
+	return self:m_flPercentageConstructed() == 1.0
+end
+
 function CBaseObject:m_iHealth()
 	return self.__handle:GetPropInt("m_iHealth")
 end
