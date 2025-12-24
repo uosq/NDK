@@ -172,6 +172,10 @@ function Player:GetEyePos()
 	return self.__handle:GetAbsOrigin() + self.__handle:GetPropVector("localdata", "m_vecViewOffset[0]")
 end
 
+function Player:GetShootPos()
+	return self:m_vecOrigin() + self:m_vecViewOffset()
+end
+
 function Player:GetHandle()
 	return self.__handle
 end
