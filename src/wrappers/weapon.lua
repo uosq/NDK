@@ -573,9 +573,8 @@ end
 --- But I dont have the patience to get all the stats for every weapon
 --- Why we dont have a native function for this??
 
----@return ProjectileInfo
+---@return ProjectileInfo?
 function Weapon:GetProjectileInfo()
-	local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 	local m_hOwner = self:m_hOwner()
 	local m_bDucking = m_hOwner:GetPropInt("m_fFlags") & FL_DUCKING ~= 0
 	local _, gravity = client.GetConVar("sv_gravity")
@@ -584,6 +583,7 @@ function Weapon:GetProjectileInfo()
 	local id = self:GetID()
 	if id == TF_WEAPON_ROCKETLAUNCHER
 	or id == TF_WEAPON_DIRECTHIT then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 23.5
 		info.offset.y = self:AttributeHookInt("centerfire_projectile", 0) == 1 and 0 or 12
 		info.offset.z = m_bDucking and 8 or -3
@@ -591,6 +591,7 @@ function Weapon:GetProjectileInfo()
 		info.hull.x = 0
 		info.hull.y = 0
 		info.hull.z = 0
+		info.gravity = 0
 		info.simple_trace = true
 		return info
 	end
@@ -598,6 +599,7 @@ function Weapon:GetProjectileInfo()
 	if id == TF_WEAPON_PARTICLE_CANNON
 	or id == TF_WEAPON_RAYGUN
 	or id == TF_WEAPON_DRG_POMSON then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		local isCowMangler = id == TF_WEAPON_PARTICLE_CANNON
 		info.offset.x = 23.5
 		info.offset.y = 8
@@ -610,6 +612,7 @@ function Weapon:GetProjectileInfo()
 
 	if id == TF_WEAPON_GRENADELAUNCHER
 	or id == TF_WEAPON_CANNON then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		local isCannon = id == TF_WEAPON_CANNON
 		local mortar = isCannon and self:AttributeHookFloat("grenade_launcher_mortar_mode", 0) or 0
 		info.speed = self:AttributeHookFloat("mult_projectile_range", m_hOwner:InCond(E_TFCOND.TFCond_RunePrecision) and 3000 or self:AttributeHookFloat("mult_projectile_speed", 1200))
@@ -620,6 +623,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_PIPEBOMBLAUNCHER then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 16
 		info.offset.y = 8
 		info.offset.z = -6
@@ -632,6 +636,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_FLAREGUN then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 23.5
 		info.offset.y = 12
 		info.offset.z = m_bDucking and 8 or -3
@@ -639,6 +644,7 @@ function Weapon:GetProjectileInfo()
 		info.hull.y = 0
 		info.hull.z = 0
 		info.speed = self:AttributeHookFloat("mult_projectile_speed", 2000)
+		info.gravity = 0
 		info.lifetime = 0.3 * gravity
 
 		return info
@@ -646,6 +652,7 @@ function Weapon:GetProjectileInfo()
 
 	--- TF_WEAPON_FLAREGUN_RENVEGE
 	if id == TF_WEAPON_RAYGUN_REVENGE then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 23.5
 		info.offset.y = 12
 		info.offset.z = m_bDucking and 8 or -3
@@ -658,6 +665,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_COMPOUND_BOW then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 23.5
 		info.offset.y = 12
 		info.offset.z = -3
@@ -675,6 +683,7 @@ function Weapon:GetProjectileInfo()
 
 	if id == TF_WEAPON_CROSSBOW
 	or id == TF_WEAPON_SHOTGUN_BUILDING_RESCUE then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		local isCrossbow = id == E_WeaponBaseID.TF_WEAPON_CROSSBOW
 		info.offset.x = 23.5
 		info.offset.y = 12
@@ -690,6 +699,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_SYRINGEGUN_MEDIC then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 16
 		info.offset.y = 6
 		info.offset.z = -8
@@ -703,6 +713,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_FLAMETHROWER then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		local _, flhull = client.GetConVar("tf_flamethrower_boxsize")
 		info.offset.x = 40
 		info.offset.y = 5
@@ -717,6 +728,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_FLAME_BALL then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 3
 		info.offset.y = 7
 		info.offset.z = -9
@@ -731,6 +743,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_CLEAVER then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 16
 		info.offset.y = 8
 		info.offset.z = -6
@@ -746,6 +759,7 @@ function Weapon:GetProjectileInfo()
 
 	if id == TF_WEAPON_BAT_WOOD
 	or id == TF_WEAPON_BAT_GIFTWRAP then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		local _, tf_scout_stunball_base_speed = client.GetConVar("tf_scout_stunball_base_speed")
 		info.speed = tf_scout_stunball_base_speed
 		info.gravity = 1
@@ -757,6 +771,7 @@ function Weapon:GetProjectileInfo()
 
 	if id == TF_WEAPON_JAR
 	or id == TF_WEAPON_JAR_MILK then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 16
 		info.offset.y = 8
 		info.offset.z = -6
@@ -771,6 +786,7 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_JAR_GAS then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.x = 16
 		info.offset.y = 8
 		info.offset.z = -6
@@ -785,16 +801,17 @@ function Weapon:GetProjectileInfo()
 	end
 
 	if id == TF_WEAPON_LUNCHBOX then
+		local info = ProjectileInfo_t.New(nil, 0, 0, 0, 0, 60, Vector3(6, 6, 6), false)
 		info.offset.z = -8
 		info.hull.x = 17
 		info.hull.y = 17
 		info.hull.z = 7
-		info.gravity = 500
-		info.lifetime = gravity
+		info.speed = 500
+		info.gravity = 1 * gravity
 		info.simple_trace = false
 	end
 
-	return info
+	return nil
 end
 
 return Weapon
