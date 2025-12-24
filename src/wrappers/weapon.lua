@@ -103,15 +103,15 @@ function Weapon:CanSecondaryAttack()
 	return self:m_flNextSecondaryAttack() <= curtime and owner:m_flNextAttack() <= curtime
 end
 
-function Weapon:IsMeleeWeapon()
+function Weapon:IsMelee()
 	return self.__handle:IsMeleeWeapon()
 end
 
-function Weapon:GetWeaponData()
+function Weapon:GetData()
 	return self.__handle:GetWeaponData()
 end
 
-function Weapon:GetWeaponProjectileType()
+function Weapon:GetProjectileType()
 	return self.__handle:GetWeaponProjectileType()
 end
 
@@ -126,7 +126,7 @@ function Weapon:CanShootPrimary(cmd)
 	end
 
 	if self.__handle:IsMeleeWeapon() then
-		return self:m_flNextPrimaryAttack() + self:GetWeaponData().smackDelay <= globals.CurTime()
+		return self:m_flNextPrimaryAttack() + self:GetData().smackDelay <= globals.CurTime()
 	end
 
 	return self:CanPrimaryAttack()
@@ -243,11 +243,11 @@ function Weapon:CanAmbassadorHeadshot()
 end
 
 function Weapon:IsHitscan()
-	return self:GetWeaponProjectileType() == E_ProjectileType.TF_PROJECTILE_BULLET
+	return self:GetProjectileType() == E_ProjectileType.TF_PROJECTILE_BULLET
 end
 
 function Weapon:IsProjectileWeapon()
-	return self:IsHitscan() == false and self:IsMeleeWeapon() == false
+	return self:IsHitscan() == false and self:IsMelee() == false
 end
 
 ---@param player Player
