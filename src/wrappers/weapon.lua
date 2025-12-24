@@ -152,22 +152,25 @@ end
 ---Always tries to return a [0, 1] value
 ---@return number
 function Weapon:GetCurrentCharge()
-	--- WARNING: CanCharge() will crash your game with a Rocket Launcher!
-	--- I have to find another way
-	--- This doesn't work right with Loose Cannon
 	if self.__handle:CanCharge() then
-		local begintime = self.__handle:GetChargeBeginTime()
-		local maxtime = self.__handle:GetChargeMaxTime()
-		if self:GetID() == TF_WEAPON_COMPOUND_BOW then
-			return globals.CurTime() - begintime >= maxtime and 1.0 or globals.CurTime() - begintime
+		local id = self:GetID()
+		local charge = self.__handle:GetCurrentCharge() or 0
+
+		--- sticky launcher
+		if id == TF_WEAPON_PIPEBOMBLAUNCHER then
+			if charge > self.__handle:GetChargeMaxTime() then
+				return 0
+			end
+
+			return charge
 		end
 
-		local diff = globals.CurTime() - begintime
-		if diff > maxtime then
-			return 0
+		--- loose cannon
+		if id == TF_WEAPON_CANNON then
+			charge = mathlib.RemapVal(charge, 1, 0, 0, 1, true)
 		end
 
-		return diff/maxtime
+		return charge
 	end
 
 	return 0
@@ -575,6 +578,10 @@ end
 
 ---@return ProjectileInfo?
 function Weapon:GetProjectileInfo()
+	if self:IsHitscan() then
+		return nil
+	end
+
 	local m_hOwner = self:m_hOwner()
 	local m_bDucking = m_hOwner:GetPropInt("m_fFlags") & FL_DUCKING ~= 0
 	local _, gravity = client.GetConVar("sv_gravity")
